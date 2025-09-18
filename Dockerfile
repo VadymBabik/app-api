@@ -1,35 +1,29 @@
-# 1. Базовий образ
-FROM node:20-alpine AS builder
-
+# ---------- BUILDER ----------
+FROM node:20-bullseye-slim AS builder
 WORKDIR /app
 
-# Встановлюємо залежності
 COPY package*.json ./
-RUN npm install --frozen-lockfile
+RUN npm ci
 
-# Копіюємо код
 COPY . .
 
-# ⚡️ Генеруємо Prisma Client перед білдом
+RUN npm run build
 RUN npx prisma generate
 
-# Будуємо NestJS
-RUN npm run build
-
-# 2. Production stage
-FROM node:20-alpine AS production
-
+# ---------- RUNTIME ----------
+FROM node:20-bullseye-slim AS runner
 WORKDIR /app
 
 ENV NODE_ENV=production
+ENV PORT=3000
 
 COPY package*.json ./
-RUN npm install --omit=dev --frozen-lockfile
+RUN npm ci --omit=dev
 
 COPY --from=builder /app/dist ./dist
-COPY --from=builder /app/node_modules/.prisma ./node_modules/.prisma
-COPY prisma ./prisma
+COPY --from=builder /app/prisma ./prisma
+COPY --from=builder /app/node_modules/.prisma ./node_modules/.prisma || true
 
 EXPOSE 3000
 
-CMD ["node", "dist/main.js"]
+CMD ["npm", "run", "start:prod"]
