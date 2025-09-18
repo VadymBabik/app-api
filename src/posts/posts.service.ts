@@ -7,14 +7,7 @@ import { Post } from './entities/post.entity';
 export class PostsService {
   private readonly logger = new Logger(PostsService.name);
 
-  constructor(
-    
-    private readonly prismaService: PrismaService,
-
-  ) {
-
-  }
-
+  constructor(private readonly prismaService: PrismaService) {}
 
   async create(data: Prisma.PostCreateInput): Promise<Post> {
     this.logger.log('create post');
