@@ -8,7 +8,7 @@ import { PostsModule } from './posts/posts.module';
     ConfigModule.forRoot({
       isGlobal: true,
       envFilePath: '.env',
-      cache: true,
+      // cache: true,
     }),
     PrismaModule,
     PostsModule,

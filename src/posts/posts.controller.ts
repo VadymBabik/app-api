@@ -13,6 +13,7 @@ export class PostsController {
 
   @Get()
   findAll() {
+    console.log(`server running on port ==> ${process.env.PORT}`);
     return this.postsService.findAll();
   }
 
