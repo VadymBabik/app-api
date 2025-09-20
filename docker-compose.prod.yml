@@ -1,0 +1,23 @@
+version: '3.8'
+
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "3003:3003"
+    environment:
+      - NODE_ENV=production
+      - DATABASE_URL=postgres://postgres:PnMeizyL39hA3oamxnKmTcXUY42h2NqVqptwLcmW6GCk7fSxOAfqcJPscao28Yky@185.239.209.26:5432/postgres
+      - APP_PORT=3003
+      - ORIGIN=http://localhost:3000
+      - API_PREFIX=/api
+      - DB_HOST=185.239.209.26
+    restart: unless-stopped
+    # healthcheck для перевірки стану додатка
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3003/api/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
