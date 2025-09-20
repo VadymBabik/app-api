@@ -1,0 +1,19 @@
+version: 1
+
+build:
+  cache: true
+  args:
+    - NODE_ENV=production
+
+deploy:
+  pre_deploy:
+    - echo "Starting pre-deploy checks..."
+  post_deploy:
+    - echo "Running post-deploy tasks..."
+    - docker exec ${CONTAINER_NAME} npx prisma migrate deploy
+
+healthcheck:
+  path: /api/health
+  timeout: 10
+  interval: 30
+  initial_delay: 40
