@@ -1,7 +1,6 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
-import { Prisma } from '@prisma/client';
-import { Post } from './entities/post.entity';
+import { Post as PostModel, Prisma } from '@prisma/client';
 
 @Injectable()
 export class PostsService {
@@ -9,13 +8,13 @@ export class PostsService {
 
   constructor(private readonly prismaService: PrismaService) {}
 
-  async create(data: Prisma.PostCreateInput): Promise<Post> {
+  async create(data: Prisma.PostCreateInput): Promise<PostModel> {
     this.logger.log('create post');
     this.logger.debug(data);
     return this.prismaService.post.create({ data });
   }
 
-  async findAll(): Promise<Post> {
+  async findAll(): Promise<PostModel[]> {
     this.logger.log('get all post');
     return this.prismaService.post.findMany();
   }
