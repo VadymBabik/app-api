@@ -2,31 +2,36 @@ FROM node:18-alpine
 
 WORKDIR /usr/src/app
 
-RUN apk add --no-cache netcat-openbsd
+# Встановлюємо залежності для збірки
+RUN apk add --no-cache netcat-openbsd python3 make g++
 
+# Копіюємо тільки package files спочатку для кращого кешування
 COPY package*.json ./
 COPY prisma ./prisma
 
-RUN npm install
+# Встановлюємо залежності
+RUN npm ci --only=production && npm cache clean --force
 
+# Генеруємо Prisma client
 RUN npx prisma generate
 
+# Копіюємо решту коду
 COPY . .
 
+# Збираємо додаток
 RUN npm run build
 
-RUN npm prune --production
-
-COPY docker-entrypoint.sh /usr/local/bin/
-RUN chmod +x /usr/local/bin/docker-entrypoint.sh
-
-RUN addgroup -g 1001 -S nodejs
-RUN adduser -S nestjs -u 1001
-RUN chown -R nestjs:nodejs /usr/src/app
+# Створюємо non-root user
+RUN addgroup -g 1001 -S nodejs && \
+    adduser -S nestjs -u 1001 && \
+    chown -R nestjs:nodejs /usr/src/app
 
 USER nestjs
 
-EXPOSE 3003
+EXPOSE 3000
 
-ENTRYPOINT [ "docker-entrypoint.sh" ]
+# Health check для Coolify
+HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
+  CMD curl -f http://localhost:3000/api/health || exit 1
+
 CMD [ "node", "dist/main" ]

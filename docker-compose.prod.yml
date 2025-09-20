@@ -1,23 +1,24 @@
+version: '3.8'
+
 services:
   app:
     build:
       context: .
       dockerfile: Dockerfile
-    env_file:
-      - .env
     ports:
-      - "${APP_PORT:-3003}:${APP_PORT:-3003}"
+      - "3000:3000"
     environment:
-      - DATABASE_URL
-      - APP_PORT
-      - ORIGIN
-      - API_PREFIX
-      - DB_HOST
-      - DB_PORT
-      - NODE_ENV
+      - NODE_ENV=production
+      - DATABASE_URL=${DATABASE_URL}
+      - APP_PORT=3000
+      - ORIGIN=${ORIGIN}
+      - API_PREFIX=/api
+      - DB_HOST=${DB_HOST}
+      - DB_PORT=${DB_PORT}
     restart: unless-stopped
-#    healthcheck:
-#      test: ["CMD", "curl", "-f", "http://localhost:${APP_PORT:-3003}/api/health"]
-#      interval: 30s
-#      timeout: 10s
-#      retries: 3
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3000/api/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s

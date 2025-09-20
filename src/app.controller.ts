@@ -1,11 +1,27 @@
 import { Controller, Get } from '@nestjs/common';
+import { PrismaService } from './prisma/prisma.service';
 
-@Controller()
+@Controller('api')
 export class AppController {
-  // constructor(private readonly appService: AppService) {}
+  constructor(private readonly prisma: PrismaService) {}
 
-  @Get()
-  getHello(): string {
-    return 'this.appService.getHello()';
+  @Get('health')
+  async healthCheck() {
+    try {
+      // Перевіряємо підключення до бази даних
+      await this.prisma.$queryRaw`SELECT 1`;
+      return {
+        status: 'OK',
+        timestamp: new Date().toISOString(),
+        database: 'connected'
+      };
+    } catch (error) {
+      return {
+        status: 'ERROR',
+        timestamp: new Date().toISOString(),
+        database: 'disconnected',
+        error: error.message 
+      };
+    }
   }
 }
