@@ -1,7 +1,7 @@
 import { Controller, Get } from '@nestjs/common';
 import { PrismaService } from './prisma/prisma.service';
 
-@Controller('api')
+@Controller()
 export class AppController {
   constructor(private readonly prisma: PrismaService) {}
 
@@ -10,17 +10,22 @@ export class AppController {
     try {
       // Перевіряємо підключення до бази даних
       await this.prisma.$queryRaw`SELECT 1`;
+
       return {
         status: 'OK',
         timestamp: new Date().toISOString(),
-        database: 'connected'
+        nodeVersion: process.version,
+        platform: process.platform,
+        database: 'connected',
+        memory: process.memoryUsage(),
+        uptime: process.uptime(),
       };
     } catch (error) {
       return {
         status: 'ERROR',
         timestamp: new Date().toISOString(),
         database: 'disconnected',
-        error: error.message 
+        error: error.message,
       };
     }
   }
