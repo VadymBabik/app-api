@@ -48,9 +48,14 @@ export class S3Service {
         uploadResult,
         publicUrl,
       };
-    } catch (error) {
-      this.logger.error(`Failed to upload file: ${error.message}`);
-      throw error;
+    } catch (error: unknown) {
+      if (error instanceof Error) {
+        this.logger.error(`Failed to upload file: ${error.message || error}`);
+        throw error;
+      } else {
+        this.logger.error(`Failed to upload file: ${String(error)}`);
+        throw new Error('Unknown error occurred during file upload');
+      }
     }
   }
 
