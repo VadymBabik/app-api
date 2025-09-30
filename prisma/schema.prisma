@@ -8,15 +8,20 @@ datasource db {
 }
 
 model User {
-  id            String        @id @default(cuid())
-  createdAt     DateTime      @default(now()) @map("created_at")
-  email         String        @unique
-  name          String?
+  id String @id @default(cuid())
+
+  email    String @unique
+  password String
+
+  name   String?
+  avatar String?
+
   accountStatus AccountStatus @default(pending) @map("account_status")
-  avatar        String?
   provider      Providers     @default(local)
   role          Roles         @default(user)
   posts         Post[]
+
+  createdAt DateTime @default(now()) @map("created_at")
 
   @@map("users")
 }
