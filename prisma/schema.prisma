@@ -1,6 +1,5 @@
 generator client {
   provider = "prisma-client-js"
-  // output   = "../generated/prisma"
 }
 
 datasource db {
@@ -9,12 +8,15 @@ datasource db {
 }
 
 model User {
-  id        String   @id @default(cuid())
-  createdAt DateTime @default(now()) @map("created_at")
-  email     String   @unique
-  name      String?
-  role      Role     @default(USER)
-  posts     Post[]
+  id            String        @id @default(cuid())
+  createdAt     DateTime      @default(now()) @map("created_at")
+  email         String        @unique
+  name          String?
+  accountStatus AccountStatus @default(pending) @map("account_status")
+  avatar        String?
+  provider      Providers     @default(local)
+  role          Roles         @default(user)
+  posts         Post[]
 
   @@map("users")
 }
@@ -25,13 +27,27 @@ model Post {
   updatedAt DateTime @updatedAt @map("updated_at")
   published Boolean  @default(false)
   title     String
-  author    User?    @relation(fields: [authorId], references: [id])
   authorId  String?
+  author    User?    @relation(fields: [authorId], references: [id])
 
   @@map("posts")
 }
 
-enum Role {
-  USER
-  ADMIN
+enum Roles {
+  user
+  admin
+  super_admin
+  manager
+}
+
+enum Providers {
+  google
+  facebook
+  local
+}
+
+enum AccountStatus {
+  pending
+  verified
+  banned
 }
